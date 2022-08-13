@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import styles from "../styles/Grid.module.css";
 
-function shuffle(array: number[]) {
+function shuffle(array: any[]) {
     let currentIndex = array.length, randomIndex;
     // While there remain elements to shuffle.
-    while (currentIndex != 0) {
+    while (currentIndex !== 0) {
         // Pick a remaining element.
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
@@ -30,7 +30,7 @@ function checkPossNum(numArray: number[][], xIndex: number, yIndex: number, unav
     let possNum: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     possNum = possNum.filter(num => !naNum.includes(num));
     // shuffle
-    return shuffle(possNum);
+    return shuffle(possNum) as number[];
 }
 
 function generateValidGrid() {
@@ -65,23 +65,14 @@ function generateValidGrid() {
     }
     return numArray;
 }
-// Backtracking algo checks if it has only 1 soln
-// 1. pick random place that is not null to remove
-// 2. check possible numbers based on sub, x-axis, y-axis (sorted) except original num, repeat to 1 if null
-// 3. if possible add to list of solutions 
-// 4. else repeat to 1.
 
-// function getRandomInt(min, max) {
-//     min = Math.ceil(min);
-//     max = Math.floor(max);
-//     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
-//   }
-function generateUniqueSolution(validGrid: number[][], difficulty?: 'easy'|'medium'|'hard'|'evil') {
+
+function generateUniqueSolution(validGrid: number[][], difficulty?: 'easy' | 'medium' | 'hard' | 'evil') {
     let numTrack: number[][][] = Array(9).fill(0).map(() => Array(9).fill(0).map(() => Array(9).fill(0)));
     let gridCopy = JSON.parse(JSON.stringify(validGrid));
-    let clue: number = 81;
-    switch (difficulty){
-        case 'easy': 
+    let clue: number = 40;
+    switch (difficulty) {
+    case 'easy':
             clue = Math.floor(Math.random() * (45 - 36) + 36);
             break;
         case 'medium':
@@ -94,22 +85,47 @@ function generateUniqueSolution(validGrid: number[][], difficulty?: 'easy'|'medi
             clue = Math.floor(Math.random() * (19 - 10) + 10);
             break;
     }
+    console.clear()
     // pick random places based on number of clues
-    let randIndexes: number[][] = Array(clue);
-    for(let i = 0; i < clue; i++){
-        let randIndex = [Math.floor(Math.random() * 9), Math.floor(Math.random() * 9)]
-        if (!randIndexes.some(val => val[0]*9+val[1] === randIndex[0]*9+randIndex[1])) randIndexes[i] = randIndex;
-        else i--
+    let randIndexes: number[][] = new Array(81).fill(0).map((val, idx) => [Math.floor((idx) / 9), (idx) % 9]);
+    // console.log(...randIndexes)
+    shuffle(randIndexes);
+    // console.log(...randIndexes)
+    // return validGrid
+    let validRandIndex = [];
+    for (let i = 0; i < clue && randIndexes.length > 0; i++) {
+        // console.log(i)
+        numTrack = Array(9).fill(0).map(() => Array(9).fill(0).map(() => Array(9).fill(0)));
+        validRandIndex.push(randIndexes[randIndexes.length - 1]);
+        randIndexes.pop();
+        let indexLimit = validRandIndex.length - 1;
+        for (let j = indexLimit; j >= 0 && j <= indexLimit; j--) {
+            for (let k = 0; k <= j; k++) gridCopy[validRandIndex[k][0]][validRandIndex[k][1]] = 0;
+            let xIndex = validRandIndex[j][0];
+            let yIndex = validRandIndex[j][1];
+            // possible numbers based on sub, x-axis, y-axis, and backtrack (shuffled) excluding 1st num
+            let possNum = checkPossNum(gridCopy, xIndex, yIndex, [j === indexLimit ? validGrid[xIndex][yIndex] : gridCopy[xIndex][yIndex], ...numTrack[xIndex][yIndex]]);
+            possNum = possNum.sort((a,b) => a-b);
+            // check all possible numbers
+            if (possNum.length > 0) {
+                gridCopy[xIndex][yIndex] = possNum[0];
+                numTrack[xIndex][yIndex].push(possNum[0]);
+                if (possNum.length ===1 && j === 0) {
+                    i--;
+                    validRandIndex.pop();
+                    break;
+                } 
+            } else {
+                numTrack[xIndex][yIndex] = [];
+                j += 2;
+            }
+        }
+        gridCopy = JSON.parse(JSON.stringify(validGrid));
+        for (let k = 0; k <= validRandIndex.length-1; k++) gridCopy[validRandIndex[k][0]][validRandIndex[k][1]] = 0;
     }
     
-    // for (let i = 0; i < clue; i++) {
-    //     for (let j = randIndexes.length-1; j >=0 ; j--){
-    //         // possible numbers based on sub, x-axis, y-axis, and backtrack (shuffled)
-    //         let possNum = checkPossNum(gridCopy, randXIndex, randYIndex, [gridCopy[randXIndex][randYIndex]]);
-    //         // if null it means there is only 1 solution so continue
-    //         if (possNum.length === 0) gridCopy[randXIndex][randYIndex] = 0;
-    //     } 
-    // }
+    // console.log(validRandIndex.length)
+    // console.log(randIndexes.length)
     return gridCopy;
 }
 
@@ -118,22 +134,16 @@ function test(t?: number[][]) {
     let count = 0;
     let x = generateValidGrid();
     t = generateUniqueSolution(x);
-    // while (cancel === false) {
-    //     t = generateValidGrid();
-    //     for (let z = 0; z < t.length; z++) {
-    //         for (let j = 0; j < t[z].length; j++) {
-    //             if (t[z][j] === 0) {
-    //                 console.log('woo');
-    //                 cancel = true;
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     count++;
-    //     if (count > 1000) { console.log('cancelled'); cancel = true };
-    // }
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            if (t && t[i][j] === 0) count++;
+        }
+    }
+    console.log(count)
     // console.log(x)
-    return x;
+    let r = t?.map(val => val.join(""))
+    console.log(r?.join().replaceAll(',','').replaceAll('0','.'))
+    return t;
 }
 
 export default function Grid(prop: { sudokuArr?: number[][] }) {
