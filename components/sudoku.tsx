@@ -64,7 +64,7 @@ function generateValidGrid() {
 }
 // Backtracking algorithm extremely slow! Max of 40 hints only
 // TODO: implement a faster algorithm that generates a unique solution down to 17 hints
-function generateSolution(validGrid: number[][], difficulty: 'easy' | 'medium' | 'hard' | 'evil' = 'easy', isUnique: boolean = true) {
+function generateSolution(validGrid: number[][], difficulty: 'easy' | 'medium' | 'hard' | 'evil' = 'easy', isUnique: boolean = false) {
     let numTrack: number[][][] = Array(9).fill(0).map(() => Array(9).fill(0).map(() => Array(9).fill(0)));
     let gridCopy = JSON.parse(JSON.stringify(validGrid));
     let clue: number;
@@ -146,7 +146,7 @@ function solveGrid(numArray: number[][]){
             numTrack[xIndex][yIndex].push(possNum[0]);
             if (i === blankIndexes.length - 1) return gridCopy; //solved grid
         } else {
-            if (i===0) return gridCopy; //not viable
+            if (i===0) {console.log("not viable"); return gridCopy; }//not viable
             numTrack[xIndex][yIndex] = [];
             gridCopy[blankIndexes[i>0?i-1:0][0]][blankIndexes[i>0?i-1:0][1]] = 0;
             i-=2;
@@ -157,20 +157,20 @@ function test(t?: number[][]) {
     let cancel = false;
     let count = 0;
     let trial:number[][] = [
-    ['1', '0', '2', '0', '7', '1', '0', '0', '3'], 
-    ['0', '3', '0', '0', '8', '0', '2', '4', '0'], 
-    ['8', '7', '6', '0', '2', '0', '0', '1', '0'], 
-    ['6', '4', '0', '9', '0', '7', '0', '0', '8'], 
-    ['0', '1', '0', '0', '3', '0', '4', '0', '0'], 
-    ['0', '0', '8', '1', '6', '0', '0', '0', '0'], 
-    ['0', '0', '7', '8', '0', '2', '0', '9', '1'], 
-    ['0', '0', '4', '7', '1', '6', '5', '3', '2'], 
-    ['0', '0', '1', '3', '0', '0', '7', '8', '4']].map((val) => val.map(v => parseInt(v)))
+    ['8', '1', '3', '0', '0', '9', '4', '0', '0'], 
+    ['0', '0', '4', '0', '0', '6', '1', '0', '0'], 
+    ['0', '0', '0', '0', '0', '0', '9', '8', '2'], 
+    ['0', '0', '0', '3', '2', '1', '0', '0', '9'], 
+    ['0', '3', '6', '4', '0', '8', '0', '7', '0'], 
+    ['0', '0', '0', '9', '6', '0', '0', '0', '0'], 
+    ['0', '8', '0', '0', '1', '0', '5', '0', '0'], 
+    ['0', '4', '7', '0', '9', '0', '0', '0', '3'], 
+    ['6', '0', '0', '0', '3', '5', '7', '0', '0']].map((val) => val.map(v => parseInt(v)))
     // trial = trial
     let x = generateValidGrid();
-    t = generateSolution(x, "easy", false);
+    // t = generateSolution(x, "easy", false);
     // t = solveGrid(t!)
-    // t = solveGrid(trial)
+    t = solveGrid(trial)
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
             if (t && t[i][j] === 0) count++;

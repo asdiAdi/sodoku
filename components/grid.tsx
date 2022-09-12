@@ -4,31 +4,136 @@ import styles from "../styles/Grid.module.css";
 import * as Sudoku from "./sudoku"
 
 
-export default function Grid(prop: { sudokuArr?: number[][] }) {
-    const [t, setT] = React.useState<number[][]>();
-    const keys = new Array(81).fill(0);
-    React.useEffect(() => setT(Sudoku.generateValidGrid()), []);
+export default function Grid(prop: {difficulty: 'easy' | 'medium' | 'hard' | 'evil', newGame: boolean}) {
+    const [board, setBoard] = React.useState<number[][]>();
+    // const keys = new Array(81).fill(0);
+    React.useEffect(() => {
+        let validGrid = Sudoku.generateValidGrid();
+        setBoard(Sudoku.generateSolution(validGrid, prop.difficulty));
+    }, [prop.newGame]);
     // prop.sudokuArr = generateSudokuGrid();
+    console.log(board)
     return (
         <div className={styles.container}>
-            <div className={styles.grid}>
-                {t?.map((numArr, idxA) => numArr.map((num, idxB) => <div className={styles.item} key={idxA*9+idxB}>{!num ? null : num}</div>))}
+            <div className={styles['outer-grid']}>
+                {/* {board?.map((numArr, idxA) => <div className={styles['inner-grid']}>2</div>)} */}
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                    {/* <div className={styles['hint-grid']}>
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                        <div>6</div>
+                        <div>7</div>
+                        <div>8</div>
+                        <div>9</div>
+                    </div> */}
+                </div>
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                </div>
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                </div>
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                </div>
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                </div>
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                </div>
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                </div>
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                </div>
+                <div className={styles['inner-grid']}>
+                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
+                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
+                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
+                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
+                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
+                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
+                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
+                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
+                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>
+                </div>
+                {/* {t?.map((numArr, idxA) => numArr.map((num, idxB) => <div className={styles.item} key={idxA*9+idxB}>{!num ? null : num}</div>))} */}
             </div>
-            <button onClick={(e) => setT(Sudoku.test())}>Click Me!</button>
+            {/* <button onClick={(e) => setT(Sudoku.test())}>Click Me!</button> */}
         </div>
 
     )
 }
 Grid.defaultProps = {
-    sudokuArr: [
-        ['0.0', 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
-        ['1.0', 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8],
-        ['2.0', 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8],
-        ['3.0', 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8],
-        ['4.0', 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8],
-        ['5.0', 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8],
-        ['6.0', 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8],
-        ['7.0', 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8],
-        ['8.0', 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8]
-    ]
+    difficulty: "easy",
+    newGame: false
 }
