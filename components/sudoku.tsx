@@ -64,19 +64,22 @@ function generateValidGrid() {
 }
 // Backtracking algorithm extremely slow! Max of 40 hints only
 // TODO: implement a faster algorithm that generates a unique solution down to 17 hints
-function generateSolution(validGrid: number[][], difficulty: 'easy' | 'medium' | 'hard' | 'evil' = 'easy', isUnique: boolean = false) {
+function generateSolution(validGrid: number[][], difficulty: 'easy' | 'medium' | 'hard' | 'expert' | 'evil' = 'easy', isUnique: boolean = false) {
     let numTrack: number[][][] = Array(9).fill(0).map(() => Array(9).fill(0).map(() => Array(9).fill(0)));
     let gridCopy = JSON.parse(JSON.stringify(validGrid));
     let clue: number;
     switch (difficulty) {
         case 'easy':
-            clue = Math.floor(Math.random() * (45 - 36) + 36);
+            clue = Math.floor(Math.random() * (45 - 37) + 37);
             break;
         case 'medium':
-            clue = Math.floor(Math.random() * (36 - 27) + 27);
+            clue = Math.floor(Math.random() * (37 - 29) + 29);
             break;
         case 'hard':
-            clue = Math.floor(Math.random() * (27 - 19) + 19);
+            clue = Math.floor(Math.random() * (29 - 22) + 22);
+            break;
+        case 'expert':
+            clue = Math.floor(Math.random() * (22 - 19) + 19);
             break;
         case 'evil':
             clue = Math.floor(Math.random() * (19 - 17) + 17);

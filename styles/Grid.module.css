@@ -4,6 +4,7 @@
     align-items: center;
     background-color: white;
     display: flex;
+    margin-bottom: 12px;
 }
 
 .outer-grid{
@@ -43,8 +44,12 @@
     justify-content: center;
     align-items: center;
     font-size: 30px;
+    font-weight: 400;
        /* line-height: 10rem; */
     /* text-align: center; */
     background-color: white;
     /* border: 20px solid rgba(0,0,0,0.8); */
+}.item:hover{
+    background-color: #CAF0F8;
 }
+
