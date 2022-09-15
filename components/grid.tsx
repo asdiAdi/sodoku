@@ -40,10 +40,11 @@ function gridReindex(idxA: number, idxB: number, idx: boolean): number {
     else return idxBTemp;
 
 }
-const initialBoard = new Array(9).fill(0).map(valA => new Array(9).fill(0).map(valB => { return { ans: 0, clue: 0, data: 0, isActive: false, color: '', backgroundColor: '' } }));
-const reducer = (board: { ans: number, clue: number, data: number | number[], isActive: boolean, color: string, backgroundColor: string }[][], action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number }) => {
+const initialBoard = new Array(9).fill(0).map(valA => new Array(9).fill(0).map(valB => { return { ans: 0, clue: 0, data: 0, isActive: false, color: '', backgroundColor: '', nextBackgroundColor:'', immediateBackgroundColor:'' } }));
+const reducer = (board: { ans: number, clue: number, data: number | number[], isActive: boolean, color: string, backgroundColor: string, nextBackgroundColor: string, immediateBackgroundColor:string }[][], action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number }) => {
     switch (action.type) {
         case "Generate":
+            // stores the generated board to the answer object and deletes the previous play data
             return board.map((arrA, idxA) => arrA.map((arrB, idxB) => {
                 if (action.grid !== undefined) {
                     arrB.ans = action.grid[idxA][idxB];
@@ -52,10 +53,13 @@ const reducer = (board: { ans: number, clue: number, data: number | number[], is
                     arrB.isActive = false;
                     arrB.color = '';
                     arrB.backgroundColor = '';
+                    arrB.nextBackgroundColor = '';
+                    arrB.immediateBackgroundColor = '';
                 }
                 return arrB;
             }));
         case "AddClue":
+            // copies tiles based on difficulty
             return board.map((arrA, idxA) => arrA.map((arrB, idxB) => {
                 if (action.grid !== undefined) {
                     arrB.clue = action.grid[idxA][idxB];
@@ -64,6 +68,7 @@ const reducer = (board: { ans: number, clue: number, data: number | number[], is
                 return arrB;
             }));
         case "Clicked":
+            // shows the current clicked tiles by its own and surrounding bacground colors
             return board.map((arrA, idxA) => arrA.map((arrB, idxB) => {
                 let rdxA = gridReindex(idxA, idxB, false);
                 let rdxB = gridReindex(idxA, idxB, true);
@@ -83,16 +88,53 @@ const reducer = (board: { ans: number, clue: number, data: number | number[], is
                                 }
                             }
                         }
+                        if(arrB.nextBackgroundColor!== '')arrB.backgroundColor = arrB.nextBackgroundColor;
                     }
                 }
+                arrB.immediateBackgroundColor = arrB.backgroundColor;
                 return arrB
             }));
         case "Input":
+            // input number from the user on a blank tile, changes color whether its wrong/correct
             return board.map((arrA, idxA) => arrA.map((arrB, idxB) => {
                 if (action.input !== undefined && arrB.isActive && arrB.clue === 0) {
                     arrB.data = action.input;
-                    arrB.color = "#0077B6";
-                };
+                    if (arrB.ans === action.input) {
+                        arrB.color = "#0077B6";
+                        arrB.nextBackgroundColor = '';
+                    }
+                    else {
+                        arrB.color = "#E35053";
+                        // detect current clicked tiles and surroundings
+                        // for (let i = 0; i <9; i++){
+                        //     for (let j = 0; j <9; j++){
+                        //         if (i === idxA && board[i][j].data === action.input){ // vertical
+                        //             board[i][j].backgroundColor = '#F6CACC';
+                        //             board[i][j].nextBackgroundColor = '#F6CACC';
+                        //             board[i][j].immediateBackgroundColor = '#F6CACC';
+                        //         } if(j === idxB && board[i][j].data === action.input){ // horizontal
+                        //             board[i][j].backgroundColor = '#F6CACC';
+                        //             board[i][j].nextBackgroundColor = '#F6CACC';
+                        //             board[i][j].immediateBackgroundColor = '#F6CACC';
+                        //         }
+                        //         // square
+                        //         if (Math.floor(idxA/3) === Math.floor(i/3)){
+                        //             if (Math.floor(idxB/3) === Math.floor(j/3) && board[i][j].data === action.input) {
+                        //                 board[i][j].backgroundColor = '#F6CACC';
+                        //                 board[i][j].nextBackgroundColor = '#F6CACC';
+                        //                 board[i][j].immediateBackgroundColor = '#F6CACC';
+                        //             }
+                        //         }
+                        //     }
+                        // }
+                        arrB.nextBackgroundColor = "#F6CACC";
+                    }
+                } else if (action.input !== undefined && arrB.data !== 0){
+                    if (arrB.data === action.input && arrB.data === arrB.ans){
+                        arrB.backgroundColor = '#0096C7';
+                    } 
+                    else arrB.backgroundColor = arrB.immediateBackgroundColor;
+                }
                 return arrB;
             }));
         default:
@@ -101,16 +143,13 @@ const reducer = (board: { ans: number, clue: number, data: number | number[], is
 }
 
 export default function Grid(prop: { difficulty: 'easy' | 'medium' | 'hard' | 'expert' | 'evil', newGameToggle: boolean, input: number, toggleInput: boolean }) {
-    // const [board1, setBoard1] = React.useState<number[][]>();
     const [itemSelect, setItemSelect] = React.useState<boolean[][]>(new Array(9).fill(0).map(valA => new Array(9).fill(0).map(valB => false)));
     const [board, dispatch] = React.useReducer(reducer, initialBoard);
-    // const [active, setActive] = React.useState<{idxA?:number, idxB?:number}>({});
     // const keys = new Array(120).fill(0).map((val, idx) => idx);
-    // const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void;
     const handleClick = (e: SyntheticEvent, idxA: number, idxB: number) => {
         dispatch({ type: "Clicked", idxA, idxB });
-        // setActive({idxA, idxB});
     }
+
     // The board will update everytime the user changes difficulty
     React.useEffect(() => {
         let validGrid = Sudoku.generateValidGrid();
@@ -118,6 +157,7 @@ export default function Grid(prop: { difficulty: 'easy' | 'medium' | 'hard' | 'e
         validGrid = Sudoku.generateSolution(validGrid, prop.difficulty);
         dispatch({ type: "AddClue", grid: validGrid });
     }, [prop.newGameToggle]);
+
     // color reset
     React.useEffect(() => {
         console.log(board)
@@ -134,106 +174,6 @@ export default function Grid(prop: { difficulty: 'easy' | 'medium' | 'hard' | 'e
                             </div>)}
                     </div>
                 )}
-
-                {/* <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[0][0]>0 ? board[0][0]:null}</div>
-                    <div className={styles.item}>{board && board[0][1]>0 ? board[0][1]:null}</div>
-                    <div className={styles.item}>{board && board[0][2]>0 ? board[0][2]:null}</div>
-                    <div className={styles.item}>{board && board[1][0]>0 ? board[1][0]:null}</div>
-                    <div className={styles.item}>{board && board[1][1]>0 ? board[1][1]:null}</div>
-                    <div className={styles.item}>{board && board[1][2]>0 ? board[1][2]:null}</div>
-                    <div className={styles.item}>{board && board[2][0]>0 ? board[2][0]:null}</div>
-                    <div className={styles.item}>{board && board[2][1]>0 ? board[2][1]:null}</div>
-                    <div className={styles.item}>{board && board[2][2]>0 ? board[2][2]:null}</div>  
-                </div>
-                <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[0][3]>0 ? board[0][3]:null}</div>
-                    <div className={styles.item}>{board && board[0][4]>0 ? board[0][4]:null}</div>
-                    <div className={styles.item}>{board && board[0][5]>0 ? board[0][5]:null}</div>
-                    <div className={styles.item}>{board && board[1][3]>0 ? board[1][3]:null}</div>
-                    <div className={styles.item}>{board && board[1][4]>0 ? board[1][4]:null}</div>
-                    <div className={styles.item}>{board && board[1][5]>0 ? board[1][5]:null}</div>
-                    <div className={styles.item}>{board && board[2][3]>0 ? board[2][3]:null}</div>
-                    <div className={styles.item}>{board && board[2][4]>0 ? board[2][4]:null}</div>
-                    <div className={styles.item}>{board && board[2][5]>0 ? board[2][5]:null}</div>
-                </div>
-                <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[0][6]>0 ? board[0][6]:null}</div>
-                    <div className={styles.item}>{board && board[0][7]>0 ? board[0][7]:null}</div>
-                    <div className={styles.item}>{board && board[0][8]>0 ? board[0][8]:null}</div>
-                    <div className={styles.item}>{board && board[1][6]>0 ? board[1][6]:null}</div>
-                    <div className={styles.item}>{board && board[1][7]>0 ? board[1][7]:null}</div>
-                    <div className={styles.item}>{board && board[1][8]>0 ? board[1][8]:null}</div>
-                    <div className={styles.item}>{board && board[2][6]>0 ? board[2][6]:null}</div>
-                    <div className={styles.item}>{board && board[2][7]>0 ? board[2][7]:null}</div>
-                    <div className={styles.item}>{board && board[2][8]>0 ? board[2][8]:null}</div>
-                </div>
-                <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[3][0]>0 ? board[3][0]:null}</div>
-                    <div className={styles.item}>{board && board[3][1]>0 ? board[3][1]:null}</div>
-                    <div className={styles.item}>{board && board[3][2]>0 ? board[3][2]:null}</div>
-                    <div className={styles.item}>{board && board[4][0]>0 ? board[4][0]:null}</div>
-                    <div className={styles.item}>{board && board[4][1]>0 ? board[4][1]:null}</div>
-                    <div className={styles.item}>{board && board[4][2]>0 ? board[4][2]:null}</div>
-                    <div className={styles.item}>{board && board[5][0]>0 ? board[5][0]:null}</div>
-                    <div className={styles.item}>{board && board[5][1]>0 ? board[5][1]:null}</div>
-                    <div className={styles.item}>{board && board[5][2]>0 ? board[5][2]:null}</div>
-                </div>
-                <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[3][3]>0 ? board[3][3]:null}</div>
-                    <div className={styles.item}>{board && board[3][4]>0 ? board[3][4]:null}</div>
-                    <div className={styles.item}>{board && board[3][5]>0 ? board[3][5]:null}</div>
-                    <div className={styles.item}>{board && board[4][3]>0 ? board[4][3]:null}</div>
-                    <div className={styles.item}>{board && board[4][4]>0 ? board[4][4]:null}</div>
-                    <div className={styles.item}>{board && board[4][5]>0 ? board[4][5]:null}</div>
-                    <div className={styles.item}>{board && board[5][3]>0 ? board[5][3]:null}</div>
-                    <div className={styles.item}>{board && board[5][4]>0 ? board[5][4]:null}</div>
-                    <div className={styles.item}>{board && board[5][5]>0 ? board[5][5]:null}</div>
-                </div>
-                <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[3][6]>0 ? board[3][6]:null}</div>
-                    <div className={styles.item}>{board && board[3][7]>0 ? board[3][7]:null}</div>
-                    <div className={styles.item}>{board && board[3][8]>0 ? board[3][8]:null}</div>
-                    <div className={styles.item}>{board && board[4][6]>0 ? board[4][6]:null}</div>
-                    <div className={styles.item}>{board && board[4][7]>0 ? board[4][7]:null}</div>
-                    <div className={styles.item}>{board && board[4][8]>0 ? board[4][8]:null}</div>
-                    <div className={styles.item}>{board && board[5][6]>0 ? board[5][6]:null}</div>
-                    <div className={styles.item}>{board && board[5][7]>0 ? board[5][7]:null}</div>
-                    <div className={styles.item}>{board && board[5][8]>0 ? board[5][8]:null}</div>
-                </div>
-                <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[6][0]>0 ? board[6][0]:null}</div>
-                    <div className={styles.item}>{board && board[6][1]>0 ? board[6][1]:null}</div>
-                    <div className={styles.item}>{board && board[6][2]>0 ? board[6][2]:null}</div>
-                    <div className={styles.item}>{board && board[7][0]>0 ? board[7][0]:null}</div>
-                    <div className={styles.item}>{board && board[7][1]>0 ? board[7][1]:null}</div>
-                    <div className={styles.item}>{board && board[7][2]>0 ? board[7][2]:null}</div>
-                    <div className={styles.item}>{board && board[8][0]>0 ? board[8][0]:null}</div>
-                    <div className={styles.item}>{board && board[8][1]>0 ? board[8][1]:null}</div>
-                    <div className={styles.item}>{board && board[8][2]>0 ? board[8][2]:null}</div>
-                </div>
-                <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[6][3]>0 ? board[6][3]:null}</div>
-                    <div className={styles.item}>{board && board[6][4]>0 ? board[6][4]:null}</div>
-                    <div className={styles.item}>{board && board[6][5]>0 ? board[6][5]:null}</div>
-                    <div className={styles.item}>{board && board[7][3]>0 ? board[7][3]:null}</div>
-                    <div className={styles.item}>{board && board[7][4]>0 ? board[7][4]:null}</div>
-                    <div className={styles.item}>{board && board[7][5]>0 ? board[7][5]:null}</div>
-                    <div className={styles.item}>{board && board[8][3]>0 ? board[8][3]:null}</div>
-                    <div className={styles.item}>{board && board[8][4]>0 ? board[8][4]:null}</div>
-                    <div className={styles.item}>{board && board[8][5]>0 ? board[8][5]:null}</div>
-                </div>
-                <div className={styles['inner-grid']}>
-                    <div className={styles.item}>{board && board[6][6]>0 ? board[6][6]:null}</div>
-                    <div className={styles.item}>{board && board[6][7]>0 ? board[6][7]:null}</div>
-                    <div className={styles.item}>{board && board[6][8]>0 ? board[6][8]:null}</div>
-                    <div className={styles.item}>{board && board[7][6]>0 ? board[7][6]:null}</div>
-                    <div className={styles.item}>{board && board[7][7]>0 ? board[7][7]:null}</div>
-                    <div className={styles.item}>{board && board[7][8]>0 ? board[7][8]:null}</div>
-                    <div className={styles.item}>{board && board[8][6]>0 ? board[8][6]:null}</div>
-                    <div className={styles.item}>{board && board[8][7]>0 ? board[8][7]:null}</div>
-                    <div className={styles.item}>{board && board[8][8]>0 ? board[8][8]:null}</div>
-                </div> */}
             </div>
 
 
@@ -247,13 +187,7 @@ export default function Grid(prop: { difficulty: 'easy' | 'medium' | 'hard' | 'e
                         <div>8</div>
                         <div>9</div>
                     </div> */}
-            {/* {t?.map((numArr, idxA) => numArr.map((num, idxB) => <div className={styles.item} key={idxA*9+idxB}>{!num ? null : num}</div>))} */}
-            {/* <button onClick={(e) => setT(Sudoku.test())}>Click Me!</button> */}
         </div>
 
     )
-}
-Grid.defaultProps = {
-    difficulty: "easy",
-    newGame: false
 }
