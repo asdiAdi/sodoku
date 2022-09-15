@@ -100,7 +100,6 @@
 }
 
 .keypad-number{
-  
   flex: 0 1 calc((100%/3) - 4px);
   color: #0096C7;
   font-size: 40px;
@@ -110,4 +109,5 @@
   text-align: center;
   border: 1px solid #0096C7;
   border-radius: 5px;
+  cursor: pointer;
 }
