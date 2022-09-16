@@ -85,9 +85,24 @@ const initialBoard: Board = {
         };
     }))
 };
-const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number, prevBoard?:Board }) => {
-    // board: {history:  {idxA?:number, idxB?:number}[], grid: { ans: number, clue: number, data: number | number[], isActive: boolean, color: string, backgroundColor: string, nextBackgroundColor: string, immediateBackgroundColor:string }[][]
-    // return board;
+let prevBoard:Board = {
+    history: [{ val: initGridData, idxA: undefined, idxB: undefined }],
+    activeTile: { idxA: 0, idxB: 0 },
+    grid: new Array(9).fill(0).map(valA => new Array(9).fill(0).map(valB => {
+        return {
+            ans: 0,
+            clue: 0,
+            data: 0,
+            noteData: [],
+            isActive: false,
+            color: '',
+            backgroundColor: '',
+            nextBackgroundColor: '',
+            immediateBackgroundColor: ''
+        };
+    }))
+};
+const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number}) => {
     const isInSelectArea = (idxA: number, idxB: number, selectIdxA: number, selectIdxB: number): boolean => {
         if (idxA === selectIdxA) return true;
         else if (idxB === selectIdxB) return true;
@@ -103,7 +118,6 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
         return false;
     }
     switch (action.type) {
-
         case "Generate": // stores the generated board to the answer object and deletes the previous play data
             board = structuredClone(initialBoard);
             board.grid = board.grid.map((arrA, idxA) => arrA.map((arrB, idxB) => {
@@ -119,6 +133,7 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
                 };
                 return arrB;
             }));
+            prevBoard = structuredClone(board);
             break;
         case "Clicked": // shows the current clicked tiles by its own and surrounding background colors
             board.grid.map((arrA, idxA) => arrA.map((arrB, idxB) => {
@@ -209,14 +224,12 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
             // 
             // console.log(activeTile)
             break;
-        case "Restart":
+        case "Restart": // restart game with current clues
             board = structuredClone(initialBoard);
             board.grid.map((arrA, idxA) => arrA.map((arrB, idxB) =>{
-                if(action.prevBoard){
-                    arrB.ans = action.prevBoard.grid[idxA][idxB].ans;
-                    arrB.clue = action.prevBoard.grid[idxA][idxB].clue;
-                    arrB.data = action.prevBoard.grid[idxA][idxB].clue;
-                }
+                arrB.ans = prevBoard.grid[idxA][idxB].ans;
+                arrB.clue = prevBoard.grid[idxA][idxB].clue;
+                arrB.data = prevBoard.grid[idxA][idxB].clue;
                 return arrB;
             }));
             break;
@@ -242,7 +255,6 @@ prop: {
     toggleRestart: boolean
 }) {
     const [board, dispatch] = React.useReducer(reducer, initialBoard);
-    const [prevBoard, setPrevBoard] = React.useState<Board>(initialBoard);
     const [prevNewGameToggle, setPrevNewGameToggle] = React.useState(prop.newGameToggle);
     const [prevToggleInput, setPrevToggleInput] = React.useState(prop.toggleInput);
     const [prevToggleUndo, setPrevToggleUndo] = React.useState(prop.toggleUndo);
@@ -260,7 +272,6 @@ prop: {
             dispatch({ type: "Generate", grid: validGrid });
             validGrid = Sudoku.generateSolution(validGrid, prop.difficulty);
             dispatch({ type: "AddClue", grid: validGrid });
-            setPrevBoard(board);
         }
     }, []);
     // The board will update everytime the user changes difficulty
@@ -270,7 +281,6 @@ prop: {
         validGrid = Sudoku.generateSolution(validGrid, prop.difficulty);
         dispatch({ type: "AddClue", grid: validGrid });
         setPrevNewGameToggle(prop.newGameToggle);
-        setPrevBoard(board);
     }
     if (prevToggleInput !== prop.toggleInput && !prop.toggleNotes) {
         // input a number in tile
@@ -295,7 +305,7 @@ prop: {
         setPrevToggleHint(prop.toggleHint);
     } 
     if (prevToggleRestart !== prop.toggleRestart) {
-        dispatch({ type: "Restart", prevBoard: prevBoard});
+        dispatch({ type: "Restart"});
         setPrevToggleRestart(prop.toggleRestart);
     }
     return (
