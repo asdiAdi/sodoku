@@ -85,7 +85,7 @@ const initialBoard: Board = {
         };
     }))
 };
-const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number }) => {
+const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number, prevBoard?:Board }) => {
     // board: {history:  {idxA?:number, idxB?:number}[], grid: { ans: number, clue: number, data: number | number[], isActive: boolean, color: string, backgroundColor: string, nextBackgroundColor: string, immediateBackgroundColor:string }[][]
     // return board;
     const isInSelectArea = (idxA: number, idxB: number, selectIdxA: number, selectIdxB: number): boolean => {
@@ -209,6 +209,17 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
             // 
             // console.log(activeTile)
             break;
+        case "Restart":
+            board = structuredClone(initialBoard);
+            board.grid.map((arrA, idxA) => arrA.map((arrB, idxB) =>{
+                if(action.prevBoard){
+                    arrB.ans = action.prevBoard.grid[idxA][idxB].ans;
+                    arrB.clue = action.prevBoard.grid[idxA][idxB].clue;
+                    arrB.data = action.prevBoard.grid[idxA][idxB].clue;
+                }
+                return arrB;
+            }));
+            break;
         default:
             throw new Error();
     }
@@ -221,18 +232,23 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
 export default function Grid(
 prop: {
     difficulty: 'easy' | 'medium' | 'hard' | 'expert' | 'evil',
-    newGameToggle: boolean, input: number, toggleInput: boolean,
+    newGameToggle: boolean,
+    input: number,
+    toggleInput: boolean,
     toggleUndo: boolean,
     toggleErase: boolean,
     toggleNotes: boolean,
-    toggleHint: boolean
+    toggleHint: boolean,
+    toggleRestart: boolean
 }) {
     const [board, dispatch] = React.useReducer(reducer, initialBoard);
+    const [prevBoard, setPrevBoard] = React.useState<Board>(initialBoard);
     const [prevNewGameToggle, setPrevNewGameToggle] = React.useState(prop.newGameToggle);
     const [prevToggleInput, setPrevToggleInput] = React.useState(prop.toggleInput);
     const [prevToggleUndo, setPrevToggleUndo] = React.useState(prop.toggleUndo);
     const [prevToggleErase, setPrevToggleErase] = React.useState(prop.toggleErase);
     const [prevToggleHint, setPrevToggleHint] = React.useState(prop.toggleHint);
+    const [prevToggleRestart, setPrevToggleRestart] = React.useState(prop.toggleRestart);
     const handleClick = (idxA: number, idxB: number) => {
         dispatch({ type: "Clicked", idxA, idxB });
     }
@@ -244,6 +260,7 @@ prop: {
             dispatch({ type: "Generate", grid: validGrid });
             validGrid = Sudoku.generateSolution(validGrid, prop.difficulty);
             dispatch({ type: "AddClue", grid: validGrid });
+            setPrevBoard(board);
         }
     }, []);
     // The board will update everytime the user changes difficulty
@@ -253,6 +270,7 @@ prop: {
         validGrid = Sudoku.generateSolution(validGrid, prop.difficulty);
         dispatch({ type: "AddClue", grid: validGrid });
         setPrevNewGameToggle(prop.newGameToggle);
+        setPrevBoard(board);
     }
     if (prevToggleInput !== prop.toggleInput && !prop.toggleNotes) {
         // input a number in tile
@@ -275,6 +293,10 @@ prop: {
     if (prevToggleHint !== prop.toggleHint) {
         dispatch({ type: "DisplayHint" });
         setPrevToggleHint(prop.toggleHint);
+    } 
+    if (prevToggleRestart !== prop.toggleRestart) {
+        dispatch({ type: "Restart", prevBoard: prevBoard});
+        setPrevToggleRestart(prop.toggleRestart);
     }
     return (
         <div className={styles.container}>
