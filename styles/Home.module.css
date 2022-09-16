@@ -84,10 +84,22 @@
 .icons-container {
   display: flex;
   width: 310px;
-  height: 45px;
+  height: 60px;
   color: #0096C7;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
+}
+
+.icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0095c719;
+  cursor:pointer;
+  border-radius: 50%;
 }
 
 .keypad-container {
