@@ -161,7 +161,7 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
                         arrB.color = "#E35053";
                         arrB.nextBackgroundColor = "#F6CACC";
                     } else arrB.nextBackgroundColor = '';
-                } else if (action.input !== undefined && arrB.data !== 0) {
+                } else if (action.input !== undefined && arrB.data !== 0 && board.grid[board.activeTile.idxA][board.activeTile.idxB].clue === 0) {
                     if (arrB.data === action.input && arrB.data === arrB.ans) {
                         arrB.backgroundColor = '#0096C7';
                     }
