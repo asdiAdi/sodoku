@@ -252,7 +252,8 @@ prop: {
     toggleErase: boolean,
     toggleNotes: boolean,
     toggleHint: boolean,
-    toggleRestart: boolean
+    toggleRestart: boolean,
+    className?: string,
 }) {
     const [board, dispatch] = React.useReducer(reducer, initialBoard);
     const [prevNewGameToggle, setPrevNewGameToggle] = React.useState(prop.newGameToggle);
@@ -309,7 +310,7 @@ prop: {
         setPrevToggleRestart(prop.toggleRestart);
     }
     return (
-        <div className={styles.container}>
+        <div className={`${prop.className?prop.className:styles.container}`}>
             <div className={styles['outer-grid']}>
                 {board.grid?.map((arrA, idxA) =>
                     <div className={styles['inner-grid']}>
