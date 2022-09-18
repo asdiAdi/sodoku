@@ -330,7 +330,7 @@ prop: {
                                 {
                                     board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.length > 0 ?
                                         // display hint data
-                                        <div className={styles['hint-grid']} style={{ color: 'black', backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }}> {Array(9).fill(0).map((val, idxC) => <div>{board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.some(val => val == idxC + 1) ? idxC + 1 : null}</div>)}</div>
+                                        <div className={styles['hint-grid']} style={{ color: 'black', backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }}> {Array(9).fill(0).map((val, idxC) => <div className={styles['hint-grid-item']}>{board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.some(val => val == idxC + 1) ? idxC + 1 : null}</div>)}</div>
                                         : //display current guess data
                                         board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].data ? board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].data : null}
                             </div>)}
