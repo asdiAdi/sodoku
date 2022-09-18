@@ -86,9 +86,9 @@ const initialBoard: Board = {
             immediateBackgroundColor: ''
         };
     })),
-    isWon:false
+    isWon: false
 };
-let prevBoard:Board = {
+let prevBoard: Board = {
     history: [{ val: initGridData, idxA: undefined, idxB: undefined }],
     activeTile: { idxA: 0, idxB: 0 },
     grid: new Array(9).fill(0).map(valA => new Array(9).fill(0).map(valB => {
@@ -104,7 +104,7 @@ let prevBoard:Board = {
             immediateBackgroundColor: ''
         };
     })),
-    isWon:false
+    isWon: false
 };
 const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number }) => {
     const isInSelectArea = (idxA: number, idxB: number, selectIdxA: number, selectIdxB: number): boolean => {
@@ -184,20 +184,20 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
             break;
         case "Undo": // undo to last edited tile  
             let lastEditedTile = board.history[board.history.length - 1];
-            
+
             // console.log(board.history.map(v=>v.val))
             if (lastEditedTile.idxA !== undefined && lastEditedTile.idxB !== undefined) {
-                    board.grid[lastEditedTile.idxA][lastEditedTile.idxB] = lastEditedTile.val;
-                    reducer(board, { type: "Clicked", idxA: lastEditedTile.idxA, idxB: lastEditedTile.idxB });
+                board.grid[lastEditedTile.idxA][lastEditedTile.idxB] = lastEditedTile.val;
+                reducer(board, { type: "Clicked", idxA: lastEditedTile.idxA, idxB: lastEditedTile.idxB });
 
-                    // if (lastEditedTile.val.clue !== 0){
-                    //     board.history = board.history.filter(grd => grd.idxA !== lastEditedTile.idxA && grd.idxB !== lastEditedTile.idxB);
-                    //     console.log(board.history)
-                    //     lastEditedTile = board.history[board.history.length - 1];
-                    // }
+                // if (lastEditedTile.val.clue !== 0){
+                //     board.history = board.history.filter(grd => grd.idxA !== lastEditedTile.idxA && grd.idxB !== lastEditedTile.idxB);
+                //     console.log(board.history)
+                //     lastEditedTile = board.history[board.history.length - 1];
+                // }
 
-                    board.history.pop();
-            } 
+                board.history.pop();
+            }
             break;
         case "Erase": // erase Active Tile
             reducer(board, { type: "Input", input: 0 });
@@ -230,7 +230,7 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
             break;
         case "Restart": // restart game with current clues
             board = structuredClone(initialBoard);
-            board.grid.map((arrA, idxA) => arrA.map((arrB, idxB) =>{
+            board.grid.map((arrA, idxA) => arrA.map((arrB, idxB) => {
                 arrB.ans = prevBoard.grid[idxA][idxB].ans;
                 arrB.clue = prevBoard.grid[idxA][idxB].clue;
                 arrB.data = prevBoard.grid[idxA][idxB].clue;
@@ -241,7 +241,7 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
             throw new Error();
     }
     // checks if won
-    if (board.grid.every(arrA => arrA.every(arrB => arrB.ans === arrB.data)))board.isWon = true;
+    if (board.grid.every(arrA => arrA.every(arrB => arrB.ans === arrB.data))) board.isWon = true;
     // copies entire object so the returned value is a new reference
     // it ensures that react rerenders
     const newBoard = structuredClone(board);
@@ -249,20 +249,20 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
 }
 
 export default function Grid(
-prop: {
-    difficulty: 'easy' | 'medium' | 'hard' | 'expert' | 'evil',
-    newGameToggle: boolean,
-    input: number,
-    toggleInput: boolean,
-    toggleUndo: boolean,
-    toggleErase: boolean,
-    toggleNotes: boolean,
-    toggleHint: boolean,
-    toggleRestart: boolean,
-    // isWon: boolean,
-    winToggle: () => void,
-    className?: string,
-}) {
+    prop: {
+        difficulty: 'easy' | 'medium' | 'hard' | 'expert' | 'evil',
+        newGameToggle: boolean,
+        input: number,
+        toggleInput: boolean,
+        toggleUndo: boolean,
+        toggleErase: boolean,
+        toggleNotes: boolean,
+        toggleHint: boolean,
+        toggleRestart: boolean,
+        // isWon: boolean,
+        winToggle: () => void,
+        className?: string,
+    }) {
     const [board, dispatch] = React.useReducer(reducer, initialBoard);
     const [prevNewGameToggle, setPrevNewGameToggle] = React.useState(prop.newGameToggle);
     const [prevToggleInput, setPrevToggleInput] = React.useState(prop.toggleInput);
@@ -297,7 +297,7 @@ prop: {
     }
     if (prevToggleInput !== prop.toggleInput && !prop.toggleNotes) {
         // input a number in tile
-        dispatch({ type: "Input", input: prop.input});
+        dispatch({ type: "Input", input: prop.input });
         setPrevToggleInput(prop.toggleInput);
     } else if (prevToggleInput !== prop.toggleInput && prop.toggleNotes) {
         // input a note in tile
@@ -314,35 +314,37 @@ prop: {
         setPrevToggleErase(prop.toggleErase);
     }
     if (prevToggleHint !== prop.toggleHint) {
-        dispatch({ type: "DisplayHint"});
+        dispatch({ type: "DisplayHint" });
         setPrevToggleHint(prop.toggleHint);
-    } 
+    }
     if (prevToggleRestart !== prop.toggleRestart) {
-        dispatch({ type: "Restart"});
+        dispatch({ type: "Restart" });
         setPrevToggleRestart(prop.toggleRestart);
     }
     return (
-        <div className={`${prop.className?prop.className:styles.container}`}>
+        <div className={`${prop.className ? prop.className : styles.container}`}>
             <div className={styles['outer-grid']}>
                 {board.grid?.map((arrA, idxA) =>
                     <div className={styles['inner-grid']} key={uuid()}>
                         {arrA.map((arrB, idxB) =>
-                            <div className={styles.item} 
-                                style={{ color: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['color'], 
-                                         backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }} 
+                            <div className={styles.item}
+                                style={{
+                                    color: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['color'],
+                                    backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor']
+                                }}
                                 onClick={() => { handleClick(gridReindex(idxA, idxB, false), gridReindex(idxA, idxB, true)) }}
                                 key={uuid()}>
                                 {
                                     board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.length > 0 ?
                                         // display hint data
-                                        <div className={styles['hint-grid']} 
-                                             style={{ color: 'black', backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }}
-                                             key={uuid()}> 
-                                                {Array(9).fill(0).map((val, idxC) => 
-                                                    <div className={styles['hint-grid-item']} key={uuid()}>
-                                                        {board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.some(val => val == idxC + 1) ? idxC + 1 : null}
-                                                    </div>)
-                                                }
+                                        <div className={styles['hint-grid']}
+                                            style={{ color: 'black', backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }}
+                                            key={uuid()}>
+                                            {Array(9).fill(0).map((val, idxC) =>
+                                                <div className={styles['hint-grid-item']} key={uuid()}>
+                                                    {board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.some(val => val == idxC + 1) ? idxC + 1 : null}
+                                                </div>)
+                                            }
                                         </div>
                                         : //display current guess data
                                         board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].data ? board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].data : null

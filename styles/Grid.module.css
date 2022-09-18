@@ -1,4 +1,4 @@
-.container{
+.container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -9,7 +9,7 @@
     height: 310px;
 }
 
-.outer-grid{
+.outer-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(3, minmax(0, 1fr));
@@ -17,7 +17,7 @@
     height: 100%;
 }
 
-.inner-grid{
+.inner-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(3, minmax(0, 1fr));
@@ -28,7 +28,7 @@
     border: 1px solid #7b7b7b7c;
 }
 
-.hint-grid{
+.hint-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(3, minmax(0, 1fr));
@@ -36,14 +36,15 @@
     height: 100%;
     background-color: white;
 }
-.hint-grid-item{
+
+.hint-grid-item {
     font-size: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.item{
+.item {
     /* align text to center */
     display: flex;
     justify-content: center;
@@ -51,15 +52,18 @@
     font-size: 30px;
     font-weight: 400;
     background-color: white;
-}.item:hover{
+}
+
+.item:hover {
     background-color: #CAF0F8;
 }
 
-@media screen and (min-width: 720px){
-    .item{
+@media screen and (min-width: 720px) {
+    .item {
         font-size: 50px;
     }
-    .hint-grid-item{
+
+    .hint-grid-item {
         font-size: 15px;
     }
 }

@@ -123,36 +123,36 @@ function generateSolution(validGrid: number[][], difficulty: 'easy' | 'medium' |
         }
         return gridCopy;
 
-    } else { 
+    } else {
         //return grid with multiple solutions
         //no algorithm so this is the fastest for medium - evil
-        for (let i = 0; i < 81 - clue && randIndexes.length > 0; i++){
+        for (let i = 0; i < 81 - clue && randIndexes.length > 0; i++) {
             gridCopy[randIndexes[i][0]][randIndexes[i][1]] = 0;
         }
         return gridCopy;
     }
 
 }
-function solveGrid(numArray: number[][]){
+function solveGrid(numArray: number[][]) {
     let numTrack: number[][][] = Array(9).fill(0).map(() => Array(9).fill(0).map(() => Array(9).fill(0)));
     let gridCopy: number[][] = JSON.parse(JSON.stringify(numArray));
     let blankIndexes: number[][] = [];
     // get all the coordinates of blank spaces
-    gridCopy.forEach((valA, idxA) => valA.forEach((valB, idxB) => valB === 0 ? blankIndexes.push([idxA, idxB]): undefined))
-    for (let i = 0; i < blankIndexes.length && i >=0 ; i++){
+    gridCopy.forEach((valA, idxA) => valA.forEach((valB, idxB) => valB === 0 ? blankIndexes.push([idxA, idxB]) : undefined))
+    for (let i = 0; i < blankIndexes.length && i >= 0; i++) {
         let xIndex = blankIndexes[i][0];
         let yIndex = blankIndexes[i][1];
         let possNum = checkPossNum(gridCopy, xIndex, yIndex, numTrack[xIndex][yIndex]);
-        if (i===0)console.log(`i: ${i} possnum:${possNum} idx:${blankIndexes[i]}`)
-        if (possNum.length > 0){
+        if (i === 0) console.log(`i: ${i} possnum:${possNum} idx:${blankIndexes[i]}`)
+        if (possNum.length > 0) {
             gridCopy[xIndex][yIndex] = possNum[0];
             numTrack[xIndex][yIndex].push(possNum[0]);
             if (i === blankIndexes.length - 1) return gridCopy; //solved grid
         } else {
-            if (i===0) {console.log("not viable"); return gridCopy; }//not viable
+            if (i === 0) { console.log("not viable"); return gridCopy; }//not viable
             numTrack[xIndex][yIndex] = [];
-            gridCopy[blankIndexes[i>0?i-1:0][0]][blankIndexes[i>0?i-1:0][1]] = 0;
-            i-=2;
+            gridCopy[blankIndexes[i > 0 ? i - 1 : 0][0]][blankIndexes[i > 0 ? i - 1 : 0][1]] = 0;
+            i -= 2;
         }
     }
 }
