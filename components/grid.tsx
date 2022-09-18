@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "../styles/Grid.module.css";
-import * as Sudoku from "./sudoku"
+import * as Sudoku from "./sudoku";
+import { v4 as uuid } from 'uuid';
 
 type GridData = {
     ans: number,
@@ -324,16 +325,30 @@ prop: {
         <div className={`${prop.className?prop.className:styles.container}`}>
             <div className={styles['outer-grid']}>
                 {board.grid?.map((arrA, idxA) =>
-                    <div className={styles['inner-grid']}>
+                    <div className={styles['inner-grid']} key={uuid()}>
                         {arrA.map((arrB, idxB) =>
-                            <div className={styles.item} style={{ color: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['color'], backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }} onClick={() => { handleClick(gridReindex(idxA, idxB, false), gridReindex(idxA, idxB, true)) }}>
+                            <div className={styles.item} 
+                                style={{ color: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['color'], 
+                                         backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }} 
+                                onClick={() => { handleClick(gridReindex(idxA, idxB, false), gridReindex(idxA, idxB, true)) }}
+                                key={uuid()}>
                                 {
                                     board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.length > 0 ?
                                         // display hint data
-                                        <div className={styles['hint-grid']} style={{ color: 'black', backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }}> {Array(9).fill(0).map((val, idxC) => <div className={styles['hint-grid-item']}>{board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.some(val => val == idxC + 1) ? idxC + 1 : null}</div>)}</div>
+                                        <div className={styles['hint-grid']} 
+                                             style={{ color: 'black', backgroundColor: board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)]['backgroundColor'] }}
+                                             key={uuid()}> 
+                                                {Array(9).fill(0).map((val, idxC) => 
+                                                    <div className={styles['hint-grid-item']} key={uuid()}>
+                                                        {board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].noteData.some(val => val == idxC + 1) ? idxC + 1 : null}
+                                                    </div>)
+                                                }
+                                        </div>
                                         : //display current guess data
-                                        board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].data ? board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].data : null}
-                            </div>)}
+                                        board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].data ? board.grid[gridReindex(idxA, idxB, false)][gridReindex(idxA, idxB, true)].data : null
+                                }
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
