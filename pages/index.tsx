@@ -18,10 +18,13 @@ const Home: NextPage = () => {
   const [time, setTime] = React.useState<string>('00:00');
   const [pause, setPause] = React.useState<boolean>(false);
   const [timerId, setTimerId] = React.useState<NodeJS.Timeout>();
+  const [isWon, setIsWon] = React.useState<boolean>(false);
+  // const [winToggle, setWinToggle] = React.useState<boolean>(false);
   const newGame = (diff: 'easy' | 'medium' | 'hard' | 'expert' | 'evil') => {
     setDifficulty(diff);
     setToggleNewGame(!toggleNewGame);
     setShowMenu(!showMenu);
+    setIsWon(false);
     setTime('00:00');
     handlePlay();
   };
@@ -29,6 +32,7 @@ const Home: NextPage = () => {
     setToggleRestart(!toggleRestart);
     setToggleNotes(false);
     setShowMenu(!showMenu);
+    setIsWon(false);
     setTime('00:00');
     handlePlay();
   }
@@ -52,6 +56,10 @@ const Home: NextPage = () => {
       setTime(timeStr);
     }, 1000))
     setPause(false);
+  }
+  const handleWin = () => {
+    setIsWon(true);
+    handlePause();
   }
   React.useEffect(() => {
       setTimerId(setTimeout(() => {
@@ -82,20 +90,28 @@ const Home: NextPage = () => {
             </div>
             : null}
         </div>
-        <div style={{ display: 'flex' }}>Difficulty: <div className={styles.difficulty}>{difficulty}</div></div>
+        <div>Difficulty:<div className={styles.difficulty}>{difficulty}</div></div>
         <div className={styles['clock-container']}>
           {time}
           {!pause ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.noselect} onClick={() => handlePause()}>
             <path d="M11 7H8V17H11V7Z" fill="currentColor" /><path d="M13 17H16V7H13V17Z" fill="currentColor" />
           </svg> :
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.noselect} onClick={() => handlePlay()}>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.noselect} onClick={() => handlePlay()} style={isWon? {pointerEvents: 'none'}: {}}>
               <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor" />
             </svg>}
         </div>
       </div>
-      {/* 9x9 Sudoku Board */}
+
+      {/*Sudoku Board, pause, win elements*/}
       <div className={styles['sudoku-container']}>
-        {pause ?
+        {isWon ?
+          <div className={`${styles['win-screen']}`}>
+            <div className={styles.congrats}>Congratulations!</div>
+            <div>Difficulty: <div className={styles.difficulty}>{difficulty}</div></div>
+            <div>Time: <div className={styles.difficulty}>{time}</div></div>
+          </div> : null
+        }
+        {pause && !isWon?
           <div className={`${styles['pause-screen']}`} onClick={() => handlePlay()}>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles['play-icon']}>
               <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor" />
@@ -103,6 +119,7 @@ const Home: NextPage = () => {
           </div> : null}
         <Grid difficulty={difficulty}
           className={styles['grid-container']}
+          winToggle={()=>handleWin()}
           newGameToggle={toggleNewGame}
           input={input} toggleInput={toggleInput}
           toggleUndo={toggleUndo}
@@ -111,7 +128,6 @@ const Home: NextPage = () => {
           toggleHint={toggleHint}
           toggleRestart={toggleRestart} />
       </div>
-
 
       {/* Icons */}
       <div className={styles['icons-container']} style={pause? {pointerEvents: 'none'}: {}}>

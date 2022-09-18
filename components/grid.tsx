@@ -17,7 +17,8 @@ type Board =
     {
         history: Array<{ val: GridData, idxA?: number, idxB?: number, }>,
         activeTile: { idxA: number, idxB: number },
-        grid: Array<Array<GridData>>
+        grid: Array<Array<GridData>>,
+        isWon: boolean
     }
 let didInit = false;
 // idx: current count in the array
@@ -83,7 +84,8 @@ const initialBoard: Board = {
             nextBackgroundColor: '',
             immediateBackgroundColor: ''
         };
-    }))
+    })),
+    isWon:false
 };
 let prevBoard:Board = {
     history: [{ val: initGridData, idxA: undefined, idxB: undefined }],
@@ -100,9 +102,10 @@ let prevBoard:Board = {
             nextBackgroundColor: '',
             immediateBackgroundColor: ''
         };
-    }))
+    })),
+    isWon:false
 };
-const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number}) => {
+const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: number, grid?: number[][], input?: number }) => {
     const isInSelectArea = (idxA: number, idxB: number, selectIdxA: number, selectIdxB: number): boolean => {
         if (idxA === selectIdxA) return true;
         else if (idxB === selectIdxB) return true;
@@ -236,6 +239,8 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
         default:
             throw new Error();
     }
+    // checks if won
+    if (board.grid.every(arrA => arrA.every(arrB => arrB.ans === arrB.data)))board.isWon = true;
     // copies entire object so the returned value is a new reference
     // it ensures that react rerenders
     const newBoard = structuredClone(board);
@@ -253,6 +258,8 @@ prop: {
     toggleNotes: boolean,
     toggleHint: boolean,
     toggleRestart: boolean,
+    // isWon: boolean,
+    winToggle: () => void,
     className?: string,
 }) {
     const [board, dispatch] = React.useReducer(reducer, initialBoard);
@@ -265,6 +272,10 @@ prop: {
     const handleClick = (idxA: number, idxB: number) => {
         dispatch({ type: "Clicked", idxA, idxB });
     }
+    // checks if won
+    React.useEffect(() => {
+        if (didInit && board.isWon) prop.winToggle();
+    }, [board.isWon]);
     // initialization
     React.useEffect(() => {
         if (!didInit) {
@@ -285,7 +296,7 @@ prop: {
     }
     if (prevToggleInput !== prop.toggleInput && !prop.toggleNotes) {
         // input a number in tile
-        dispatch({ type: "Input", input: prop.input });
+        dispatch({ type: "Input", input: prop.input});
         setPrevToggleInput(prop.toggleInput);
     } else if (prevToggleInput !== prop.toggleInput && prop.toggleNotes) {
         // input a note in tile
@@ -302,7 +313,7 @@ prop: {
         setPrevToggleErase(prop.toggleErase);
     }
     if (prevToggleHint !== prop.toggleHint) {
-        dispatch({ type: "DisplayHint" });
+        dispatch({ type: "DisplayHint"});
         setPrevToggleHint(prop.toggleHint);
     } 
     if (prevToggleRestart !== prop.toggleRestart) {

@@ -156,38 +156,7 @@ function solveGrid(numArray: number[][]){
         }
     }
 }
-function test(t?: number[][]) {
-    let cancel = false;
-    let count = 0;
-    let trial:number[][] = [
-    ['8', '1', '3', '0', '0', '9', '4', '0', '0'], 
-    ['0', '0', '4', '0', '0', '6', '1', '0', '0'], 
-    ['0', '0', '0', '0', '0', '0', '9', '8', '2'], 
-    ['0', '0', '0', '3', '2', '1', '0', '0', '9'], 
-    ['0', '3', '6', '4', '0', '8', '0', '7', '0'], 
-    ['0', '0', '0', '9', '6', '0', '0', '0', '0'], 
-    ['0', '8', '0', '0', '1', '0', '5', '0', '0'], 
-    ['0', '4', '7', '0', '9', '0', '0', '0', '3'], 
-    ['6', '0', '0', '0', '3', '5', '7', '0', '0']].map((val) => val.map(v => parseInt(v)))
-    // trial = trial
-    let x = generateValidGrid();
-    // t = generateSolution(x, "easy", false);
-    // t = solveGrid(t!)
-    t = solveGrid(trial)
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            if (t && t[i][j] === 0) count++;
-        }
-    }
-    console.log(count)
-    let r = t?.map(val => val.join(""))
-    console.log(r?.join().replaceAll(',', '').replaceAll('0', '.'))
-    // console.log('1.2.71..3.3..8.24.876.2..1.64.9.7..8.1..3.4....816......78.2.91..4716532..13..784'.replaceAll('.', '0').split(""))
-    return t;
-}
-
 export {
-    test,
     generateSolution,
     generateValidGrid,
     solveGrid
