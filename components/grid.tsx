@@ -205,8 +205,11 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
         case "AddNote": //add notes based on player input
             if (action.input !== undefined) {
                 let activeTile = board.grid[board.activeTile.idxA][board.activeTile.idxB];
+                activeTile.nextBackgroundColor='';
                 board.history.push({ idxA: board.activeTile.idxA, idxB: board.activeTile.idxB, val: structuredClone(activeTile) });
-                activeTile.noteData.push(action.input);
+                if(activeTile.noteData.some(val => val===action.input)){
+                    activeTile.noteData = activeTile.noteData.filter(val => val!==action.input)
+                } else activeTile.noteData.push(action.input);
             }
             break;
         case "DisplayHint": //displays true answer on active tile
