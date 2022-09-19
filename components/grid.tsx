@@ -203,18 +203,17 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
             reducer(board, { type: "Input", input: 0 });
             break;
         case "AddNote": //add notes based on player input
-            if (action.input !== undefined) {
-                let activeTile = board.grid[board.activeTile.idxA][board.activeTile.idxB];
-                activeTile.nextBackgroundColor='';
-                board.history.push({ idxA: board.activeTile.idxA, idxB: board.activeTile.idxB, val: structuredClone(activeTile) });
-                if(activeTile.noteData.some(val => val===action.input)){
-                    activeTile.noteData = activeTile.noteData.filter(val => val!==action.input)
-                } else activeTile.noteData.push(action.input);
+            // case clauses inside switch blocks don't create their own block scopes so activeTile is changed to actTile
+            let actTile = board.grid[board.activeTile.idxA][board.activeTile.idxB];
+            if (action.input !== undefined && actTile.clue === 0) {
+                actTile.nextBackgroundColor='';
+                board.history.push({ idxA: board.activeTile.idxA, idxB: board.activeTile.idxB, val: structuredClone(actTile) });
+                if(actTile.noteData.some(val => val===action.input)){
+                    actTile.noteData = actTile.noteData.filter(val => val!==action.input)
+                } else actTile.noteData.push(action.input);
             }
             break;
         case "DisplayHint": //displays true answer on active tile
-            // board.activeTile
-            // board.grid[board.activeTile.idxA][board.activeTile.idxB] = structuredClone(initGridData);
             let activeTile = board.grid[board.activeTile.idxA][board.activeTile.idxB];
             board.grid[board.activeTile.idxA][board.activeTile.idxB] = {
                 ans: activeTile.ans,
@@ -228,8 +227,6 @@ const reducer = (board: Board, action: { type: string, idxA?: number, idxB?: num
                 immediateBackgroundColor: ''
             }
             board.history = board.history.filter(grd => grd.idxA !== board.activeTile.idxA && grd.idxB !== board.activeTile.idxB);
-            // 
-            // console.log(activeTile)
             break;
         case "Restart": // restart game with current clues
             board = structuredClone(initialBoard);
